@@ -9,7 +9,7 @@ export default async function Home() {
       <Button>Click me!</Button>
       <ul>
         {games.map((item) => {
-          return <li key={item.id}>{item.name}</li>;
+          return <li key={item.id}>{JSON.stringify(item)}</li>;
         })}
       </ul>
     </div>
