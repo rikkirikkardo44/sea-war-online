@@ -12,3 +12,122 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum BoardSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum GameStatus {
+  WAITING_FOR_PLAYERS
+  IN_PROGRESS
+  FINISHED
+}
+
+enum CellLevel {
+  SURFACE
+  UNDERWATER
+  AIR
+}
+
+enum ActionType {
+  SHOOT
+  MOVE_SHIP
+  PLACE_SHIP
+  END_TURN
+}
+
+model User {
+  id       String    @id @default(uuid())
+  name     String
+  email    String    @unique
+  rating   Int       @default(1000)
+  players  Player[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Game {
+  id                   String         @id @default(uuid())
+  status               GameStatus
+  boardSize            BoardSize
+  allowedCoordinatesX  String[]       // Array of X coordinates (e.g., ["A", "B", "C"])
+  allowedCoordinatesY  String[]       // Array of Y coordinates (e.g., ["1", "2", "3"])
+  allowedCoordinatesZ  String[]      // Optional array of Z levels
+  startTime            DateTime?
+  endTime              DateTime?
+  currentTurnStartTime DateTime?
+  settings             GameSettings?
+  players              Player[]
+  actionsLog           ActionLog[]
+  results              GameResults?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  scores               PlayerScore[]
+}
+
+model GameSettings {
+  id                String  @id @default(uuid())
+  gameId            String  @unique
+  game              Game    @relation(fields: [gameId], references: [id])
+  timePerTurn       Int?
+  allowDiagonalHits Boolean @default(false)
+  shipPlacementRules String? // "strict" | "flexible"
+}
+
+model Player {
+  id      String  @id @default(uuid())
+  userId  String?
+  user    User?   @relation(fields: [userId], references: [id])
+  gameId  String
+  game    Game    @relation(fields: [gameId], references: [id])
+  name    String
+  rating  Int
+  ships   Ship[]
+  actions ActionLog[] // Обратная связь
+  scores  PlayerScore[] // Обратная связь
+}
+
+model Ship {
+  id      String  @id @default(uuid())
+  playerId String
+  player  Player  @relation(fields: [playerId], references: [id])
+  location Json   // JSON array of cells occupied by the ship
+  hits    Json    // JSON array of cells hit
+  isSunk  Boolean @default(false)
+}
+
+model ActionLog {
+  id        String     @id @default(uuid())
+  gameId    String
+  game      Game       @relation(fields: [gameId], references: [id])
+  playerId  String
+  player    Player     @relation(fields: [playerId], references: [id])
+  action    ActionType
+  timestamp DateTime   @default(now())
+  target    Json?      // JSON representation of the target cell
+}
+
+model GameResults {
+  id        String       @id @default(uuid())
+  gameId    String       @unique
+  game      Game         @relation(fields: [gameId], references: [id])
+  winnerId  String
+  scores    PlayerScore[]
+  duration  Int          // Duration in seconds
+}
+
+model PlayerScore {
+  id        String  @id @default(uuid())
+  gameId    String
+  game      Game    @relation(fields: [gameId], references: [id])
+  playerId  String
+  player    Player  @relation(fields: [playerId], references: [id])
+  gameResultsId  String?
+  gameResults    GameResults? @relation(fields: [gameResultsId], references: [id])
+  hits      Int
+  missedShots Int
+  shipsSunk Int
+  isWinner  Boolean
+}
