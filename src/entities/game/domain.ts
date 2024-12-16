@@ -30,6 +30,17 @@ export type Game = {
   results?: GameResults;
 };
 
+export type GameListItem = {
+  /** Идентификатор игры */
+  id: string;
+  /** Статус */
+  status: GameStatus;
+  /** Размер поля */
+  boardSize: BoardSize;
+  /** Количество игроков */
+  playersCount: number;
+};
+
 /** Игрок */
 export type Player = {
   /** Идентификатор */
@@ -148,7 +159,7 @@ export type ActionLog = {
   /** Цель действия */
   target?: Cell;
   /** Детали */
-  details?: string
+  details?: string;
 };
 
 /** Тип действия */
@@ -165,15 +176,14 @@ export enum ActionType {
 
 /** Размеры поля */
 export enum BoardSize {
-  Small = "10x10",
-  Medium = "15x15",
-  Large = "20x20",
+  Small = "SMALL",
+  Medium = "MEDIUM",
+  Large = "LARGE",
 }
 
 /** Статусы игры */
 export enum GameStatus {
-  WaitingForPlayers = "WaitingForPlayers",
-  InProgress = "InProgress",
-  Paused = 'Paused',
-  Finished = "Finished",
+  WaitingForPlayers = "WAITING_FOR_PLAYERS",
+  InProgress = "IN_PROGRESS",
+  Finished = "FINISHED",
 }
