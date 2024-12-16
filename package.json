@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "prettier": "npx prettier . --write",
+    "db:migrate:create": "dotenv -e .env.development -- npx prisma migrate dev",
     "db:reset": "dotenv -e .env.development -- npx prisma migrate reset"
   },
   "dependencies": {

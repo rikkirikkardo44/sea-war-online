@@ -1,17 +1,11 @@
-import { Button } from "@/shared/ui/button";
-import { db } from "@/shared/lib/db";
+import React from "react";
+
+import { GamesList } from "@/features/games-list";
 
 export default async function Home() {
-  const games: { id: string; name: string }[] = await db.game.findMany();
-
   return (
-    <div>
-      <Button>Click me!</Button>
-      <ul>
-        {games.map((item) => {
-          return <li key={item.id}>{JSON.stringify(item)}</li>;
-        })}
-      </ul>
+    <div className="grid gap-4 grid-cols-3 grid-rows-3 p-4">
+      <GamesList />
     </div>
   );
 }
